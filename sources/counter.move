@@ -8,7 +8,7 @@
 /// - the owner of the counter can reset it to any value
 module counter::counter {
   /// A shared counter.
-  public struct Counter has key {
+  public struct Counter has key, store {
     id: UID,
     owner: address,
     value: u64
@@ -23,6 +23,16 @@ module counter::counter {
     })
   }
 
+  
+  public fun create_and_transfer_counter(contract_address: address, ctx: &mut TxContext) {
+    let counter = Counter {
+      id: object::new(ctx),
+      owner: ctx.sender(),
+      value: 0
+    };
+    // 使用 transfer::transfer_to_address 将计数器的所有者设置为当前合约地址
+    transfer::public_transfer(counter, contract_address);
+    }
   /// Increment a counter by 1.
   public fun increment(counter: &mut Counter) {
     counter.value = counter.value + 1;
